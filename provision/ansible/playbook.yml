@@ -1,0 +1,27 @@
+- hosts: all
+  become: yes
+  vars:
+    mongodb_conf_port: 27400
+    mongodb_version: "3.2.12"
+    node_versions:
+      - 7.1.0
+    node_packages: null
+  pre_tasks:
+  - name: update apt cache
+    apt: update_cache=yes
+
+  tasks:
+  - name: Install packages
+    apt:
+      name: "{{item}}"
+      state: latest
+    with_items:
+     - git
+
+  roles:
+  - fubarhouse.nodejs
+  - Stouts.mongodb
+
+# Need to automate creation of mongodb Ubuntu startup script. In the meantime,
+# following this guide, but instead of mongodb.service, name the file mongod.service.
+# https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-16-04

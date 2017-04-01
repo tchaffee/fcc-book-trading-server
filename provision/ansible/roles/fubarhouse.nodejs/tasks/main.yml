@@ -1,0 +1,37 @@
+---
+# Main tasks file for fubarhouse.nodejs
+
+- name: "Define user variable for ssh use"
+  set_fact:
+    fubarhouse_user: "{{ ansible_ssh_user }}"
+  when: ansible_ssh_user is defined and fubarhouse_user is undefined
+
+- name: "Define user variable for non-ssh use"
+  set_fact:
+    fubarhouse_user: "{{ ansible_user_id }}"
+  when: ansible_ssh_user is not defined and fubarhouse_user is undefined
+
+- name: "Define OS-specific variables"
+  include_vars: "config-{{ ansible_os_family }}.yml"
+  when: fubarhouse_npm is not defined
+
+- include: nvm.yml
+  when: fubarhouse_npm.install_nvm
+
+- include: ivm.yml
+  when: 'fubarhouse_npm.install_ivm and "{{ ansible_os_family }}" != "Darwin"'
+
+- include: nodejs.yml
+  when: fubarhouse_npm.install_nodejs
+
+- include: iojs.yml
+  when: 'fubarhouse_npm.install_iojs and "{{ ansible_os_family }}" != "Darwin"'
+
+- include: npm.yml
+  when: fubarhouse_npm.install_npm
+
+- name: "Verify Node/IOJS version in use"
+  shell: "{{ fubarhouse_npm.nvm_symlink_exec }} ls | grep current | cat"
+  register: node_current_version
+  changed_when: false
+  failed_when: 'node_current_version.stdout.find("{{ node_version }}") == -1'

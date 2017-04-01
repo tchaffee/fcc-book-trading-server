@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "books": {
+      "type": "array",
+      "items": { 
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "googleId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [ "_id", "title", "googleId" ]          
+      }, 
+      "minItems": 0,
+      "uniqueItems": true        
+    }
+  },
+  "required": [
+    "books"
+  ]
+}

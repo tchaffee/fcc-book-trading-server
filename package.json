@@ -1,0 +1,33 @@
+{
+  "name": "fcc-book-trading-server",
+  "version": "0.0.1",
+  "description": "freeCodeCamp Book Trading - Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run server",
+    "server": "babel-watch -L src/server.js",
+    "test": "node_modules/.bin/cucumber-js test"
+  },
+  "author": "Todd Chaffee",
+  "license": "ISC",
+  "devDependencies": {
+    "apickli": "^1.7.3",
+    "babel-eslint": "^7.1.1",
+    "babel-watch": "^2.0.6",
+    "chai": "^3.5.0",
+    "cucumber": "^2.0.0-rc.9",
+    "eslint": "^3.16.1",
+    "jsonwebtoken": "^7.3.0",
+    "node-fetch": "^1.6.3",
+    "pow-mongodb-fixtures": "^0.14.0"
+  },
+  "dependencies": {
+    "babel-core": "^6.23.1",
+    "body-parser": "^1.17.1",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.2",
+    "express-jwt": "^5.1.0",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.9.0"
+  }
+}
