@@ -1,6 +1,6 @@
 'use strict';
 
-const includes = require('lodash/includes'); 
+const includes = require('lodash/includes');
 const Books = require('../models/books.js');
 const Users = require('../models/users.js');
 const UserController = require('../controllers/userController.js');
@@ -15,15 +15,12 @@ function BookController () {
     newBook.googleId = googleId;
     newBook.title = title;
     return newBook.save();
-  } 
+  }
 
   this.getBookByGoogleId = function (googleId) {
-    console.log('getBookByGoogleId');
 
     return Books.findOne({ googleId: googleId })
     .then(bookDoc => {
-      console.log('Books.findOne ok!');
-      console.log(bookDoc);
 
       if ( ! bookDoc ) {
         return false;
@@ -45,39 +42,49 @@ function BookController () {
     });
   }
 
-  this.getAllBooks = function (authUserId) {
-    const tradeController = new TradeController();
+  this.getUsersBooks = function () {
+    const getUsers = Users.find().populate('books');
 
-    // TODO: What an indentation mess! Simplify.
-
-    console.log('Getting all books...');
-
-    return Users.find()
-    .then(users => {
-      let bookPromises = []
-        , rtnBooks = [];
+    return getUsers.then(users => {
+      let rtnBooks = [];
 
       users.forEach(user => {
         user.books.forEach(book => {
-          bookPromises.push(
-            Books.findOne({ _id: book.toString() })
-            .then(book => {
-              console.log('Trying to see if is requested.');
-              return tradeController.isRequested(user.external_id, book, authUserId)
-              .then(requested => {
-                return Object.assign({}, { owner: user.external_id, requested: requested }, book._doc);
-              })
-            })
-          );
-        });
-
+          rtnBooks.push({ book: book, user: user});
+        })
       });
+
+      return rtnBooks;
+    });
+  }
+
+  this.decorateUsersBooksWithRequested = function (userBooks, borrower) {
+    const tradeController = new TradeController();
+      let bookPromises = [];
+
+      userBooks.forEach(userBook => {
+        bookPromises.push(
+          tradeController.isRequested(userBook.user, userBook.book, borrower)
+          .then(requested => {
+            return Object.assign({}, { owner: userBook.user.external_id, requested: requested }, userBook.book._doc);
+          })
+        );
+      })
 
       return Promise.all(bookPromises)
       .then(books => {
         return books;
       })
+  }
 
+  this.getAllBooks = function (authUserId) {
+    const userController = new UserController();
+    const getBorrower = userController.getOrCreateUser(authUserId);
+    const getUserBooks = self.getUsersBooks();
+
+    return Promise.all([getBorrower, getUserBooks])
+    .then(([borrower, userBooks]) => {
+      return self.decorateUsersBooksWithRequested(userBooks, borrower);
     });
   }
 
@@ -103,16 +110,8 @@ function BookController () {
     const getBook = self.getBookByGoogleId(bookGoogleId);
     const getUser = userController.getOrCreateUser(user.sub);
 
-    console.log(getBook);
-    console.log(getUser);
-
     return Promise.all([getBook, getUser])
     .then( ([book, user]) => {
-      console.log('deleteMyBook promises returned...');
-      console.log(book);
-      console.log(user);
-      console.log(! book);
-      console.log(String(book._id));
       const bookIds = user.books.map(el => el.toString());
 
       if ( ! book) return true;
@@ -132,8 +131,6 @@ function BookController () {
       .then(booksDoc => {
         if (booksDoc) {
           return booksDoc.map(el => {
-            console.log('el');
-            console.log(el);
             return Object.assign({}, { owner: user.external_id }, el.toObject())
           });
         } else {

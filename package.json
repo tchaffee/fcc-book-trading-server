@@ -5,19 +5,23 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run server",
+    "build": "babel src --out-dir dist --source-maps --retain-lines",
     "server": "babel-watch -L src/server.js",
-    "test": "node_modules/.bin/cucumber-js test"
+    "test": "node_modules/.bin/cucumber-js test",
+    "debug": "babel-watch src/server.js --inspect"
   },
   "author": "Todd Chaffee",
   "license": "ISC",
   "devDependencies": {
     "apickli": "^1.7.3",
+    "babel-cli": "^6.24.0",
     "babel-eslint": "^7.1.1",
     "babel-watch": "^2.0.6",
     "chai": "^3.5.0",
     "cucumber": "^2.0.0-rc.9",
     "eslint": "^3.16.1",
     "jsonwebtoken": "^7.3.0",
+    "mongo-express": "^0.39.1",
     "node-fetch": "^1.6.3",
     "pow-mongodb-fixtures": "^0.14.0"
   },

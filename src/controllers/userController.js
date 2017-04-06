@@ -18,11 +18,8 @@ function UserController () {
    */
   this.getOrCreateUser = function (authUserId) {
 
-    console.log('getOrCreateUser');
-
     return Users.findOne({ external_id: authUserId})
     .then(userDoc => {
-      console.log('returned from Users.findOne!');
       if ( ! userDoc ) {
         return self.addUser(authUserId);
       }
