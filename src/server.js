@@ -15,6 +15,10 @@ const bookController = new BookController();
 const TradeController = require(path + '/src/controllers/tradeController.js');
 const tradeController = new TradeController();
 
+const UserController = require(path + '/src/controllers/userController.js');
+const userController = new UserController();
+
+
 var mongo_express = require('mongo-express/lib/middleware');
 var mongo_express_config = require('./mongo_express_config');
 
@@ -146,7 +150,38 @@ router.post('/api/users/me/traderequests/approve', authenticate, function(req, r
     tradeController.addTrade(bodyJSON.owner, bodyJSON.googleId, req.user.sub)
     .then(() => { res.sendStatus(200)});
   }
-})
+});
+
+// Get your profile.
+router.get('/api/users/me', authenticate, function(req, res) {
+
+  console.log('GET /api/users/me');
+
+  if ( ! req.user ) {
+    res.json({ error: 'User is not authenticated.' } );
+    return;
+  }
+
+  userController.getProfile(req.user.sub)
+  .then(user => { 
+    res.json({ user: user });
+  });
+
+});
+
+
+// Update your profile.
+router.put('/api/users/me', authenticate, function(req, res) {
+
+  if ( ! req.user ) {
+    res.json({ error: 'User is not authenticated.' } );
+  } else {
+    const bodyJSON = req.body;
+
+    userController.updateProfile(req.user.sub, bodyJSON.name, bodyJSON.city, bodyJSON.state)
+    .then(() => { res.sendStatus(200)});
+  }
+});
 
 // apply the routes to our application
 app.use('/', router);

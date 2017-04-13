@@ -35,6 +35,21 @@ function UserController () {
     return newUser.save();
   }
 
+  this.getProfile = function (authUserId) {
+    return self.getOrCreateUser(authUserId)
+    .then(user => user);
+  }
+
+  this.updateProfile = function (authUserId, name, city, state) {
+    return self.getOrCreateUser(authUserId)
+    .then((user) => {
+      user.name = name;
+      user.city = city;
+      user.state = state;
+      return user.save();
+    });
+  }
+
 };
 
 module.exports = UserController;

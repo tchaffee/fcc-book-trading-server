@@ -7,6 +7,9 @@ const Schema = mongoose.Schema;
 
 const User = new Schema({
 	external_id: String,
+	name: String,
+	city: String,
+	state: String,
 	books: [ {type : mongoose.Schema.ObjectId, ref : 'Book'} ]
 });
 
